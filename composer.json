@@ -1,0 +1,29 @@
+{
+	"name": "noorweb/wp-site-doctor",
+	"description": "Comprehensive WordPress site health scanner, conflict resolver, and auto-repair engine.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Noor Web Limited",
+			"homepage": "https://noorweb.uk"
+		}
+	],
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+	},
+	"scripts": {
+		"make-pot": "wp i18n make-pot . languages/wp-site-doctor.pot --slug=wp-site-doctor --domain=wp-site-doctor",
+		"phpcs": "phpcs",
+		"phpcbf": "phpcbf"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}

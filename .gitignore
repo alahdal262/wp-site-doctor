@@ -1,0 +1,25 @@
+# Dependencies
+vendor/
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.zip
+*.tar.gz
+
+# Debug
+debug.log
+error_log
+
+# Composer lock (not needed for plugins)
+composer.lock

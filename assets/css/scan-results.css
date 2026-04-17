@@ -1,0 +1,289 @@
+/**
+ * WP Site Doctor - Scan Results Styles
+ *
+ * Severity badges, issue cards, and results display.
+ */
+
+/* Issue Cards */
+.wpsd-issue {
+	padding: 15px;
+	margin-bottom: 10px;
+	border-left: 4px solid #c3c4c7;
+	background: #f6f7f7;
+	border-radius: 0 4px 4px 0;
+}
+
+.wpsd-issue:last-child {
+	margin-bottom: 0;
+}
+
+.wpsd-issue-critical {
+	border-left-color: #d63638;
+	background: #fcecec;
+}
+
+.wpsd-issue-warning {
+	border-left-color: #dba617;
+	background: #fef8e8;
+}
+
+.wpsd-issue-info {
+	border-left-color: #2271b1;
+	background: #e7f2fa;
+}
+
+.wpsd-issue-pass {
+	border-left-color: #00a32a;
+	background: #edfaef;
+}
+
+/* Issue Header */
+.wpsd-issue-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin-bottom: 8px;
+}
+
+.wpsd-issue-title {
+	font-size: 14px;
+	line-height: 1.4;
+	color: #1d2327;
+}
+
+/* Severity Badges */
+.wpsd-severity-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.wpsd-severity-critical {
+	background: #d63638;
+	color: #fff;
+}
+
+.wpsd-severity-warning {
+	background: #dba617;
+	color: #fff;
+}
+
+.wpsd-severity-info {
+	background: #2271b1;
+	color: #fff;
+}
+
+.wpsd-severity-pass {
+	background: #00a32a;
+	color: #fff;
+}
+
+/* Issue Content */
+.wpsd-issue-recommendation {
+	color: #646970;
+	font-size: 13px;
+	margin: 0 0 10px;
+	line-height: 1.5;
+}
+
+/* Fix Button */
+.wpsd-fix-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+}
+
+.wpsd-fix-btn .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+.wpsd-fix-btn:hover {
+	color: #135e96;
+}
+
+/* Results Card */
+.wpsd-results-card {
+	margin-bottom: 20px;
+}
+
+/* Plugin X-Ray Table */
+.wpsd-xray-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.wpsd-xray-table th,
+.wpsd-xray-table td {
+	padding: 10px 12px;
+	text-align: left;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.wpsd-xray-table th {
+	background: #f6f7f7;
+	font-weight: 600;
+	font-size: 13px;
+	color: #1d2327;
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.wpsd-xray-table th:hover {
+	background: #eaeaea;
+}
+
+.wpsd-xray-table th .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	vertical-align: middle;
+	margin-left: 4px;
+	color: #646970;
+}
+
+.wpsd-xray-table tbody tr:hover {
+	background: #f6f7f7;
+}
+
+.wpsd-xray-table td {
+	font-size: 13px;
+}
+
+/* Load Impact Badges */
+.wpsd-impact-low {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+.wpsd-impact-medium {
+	color: #dba617;
+	font-weight: 600;
+}
+
+.wpsd-impact-high {
+	color: #d63638;
+	font-weight: 600;
+}
+
+/* Auto-Repair Page */
+.wpsd-repair-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wpsd-repair-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 15px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.wpsd-repair-item:last-child {
+	border-bottom: none;
+}
+
+.wpsd-repair-item label {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	flex: 1;
+	cursor: pointer;
+}
+
+.wpsd-repair-item input[type="checkbox"] {
+	margin-top: 3px;
+	flex-shrink: 0;
+}
+
+.wpsd-repair-desc {
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.wpsd-repair-detail {
+	font-size: 12px;
+	color: #646970;
+	margin-top: 2px;
+}
+
+.wpsd-irreversible-badge {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	background: #fcecec;
+	color: #d63638;
+}
+
+/* Repair Confirmation */
+.wpsd-repair-confirm {
+	margin: 20px 0;
+	padding: 15px;
+	background: #fef8e8;
+	border: 1px solid #dba617;
+	border-radius: 4px;
+}
+
+.wpsd-repair-confirm label {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	font-weight: 600;
+}
+
+/* Repair Log Table */
+.wpsd-repair-log-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.wpsd-repair-log-table th,
+.wpsd-repair-log-table td {
+	padding: 8px 12px;
+	text-align: left;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.wpsd-repair-log-table th {
+	background: #f6f7f7;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.wpsd-status-completed {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+.wpsd-status-failed {
+	color: #d63638;
+	font-weight: 600;
+}
+
+.wpsd-status-rolled_back {
+	color: #2271b1;
+	font-weight: 600;
+}
+
+.wpsd-status-pending {
+	color: #dba617;
+	font-weight: 600;
+}
+
+.wpsd-rollback-btn {
+	font-size: 12px;
+}
