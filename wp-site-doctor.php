@@ -3,7 +3,7 @@
  * Plugin Name:       WP Site Doctor
  * Plugin URI:        https://noorweb.uk/wp-site-doctor
  * Description:       Comprehensive WordPress site health scanner, conflict resolver, and auto-repair engine. Diagnoses performance, security, caching, database, image, SEO, and plugin issues with one-click fixes.
- * Version:           1.0.1
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Noor Web Limited
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin constants.
  */
-define( 'WPSD_VERSION', '1.0.1' );
+define( 'WPSD_VERSION', '1.1.0' );
 define( 'WPSD_DB_VERSION', '1.0.0' );
 define( 'WPSD_PLUGIN_FILE', __FILE__ );
 define( 'WPSD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

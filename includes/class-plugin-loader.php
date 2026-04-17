@@ -343,6 +343,10 @@ class Plugin_Loader {
 				'id'    => 'plugin_xray',
 				'label' => esc_html__( 'Plugin X-Ray', 'wp-site-doctor' ),
 			),
+			array(
+				'id'    => 'storage',
+				'label' => esc_html__( 'Storage & Cleanup', 'wp-site-doctor' ),
+			),
 		);
 	}
 }

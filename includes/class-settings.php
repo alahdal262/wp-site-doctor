@@ -183,6 +183,7 @@ class Settings {
 					'images'             => __( 'Images', 'wp-site-doctor' ),
 					'plugin_conflicts'   => __( 'Plugin Conflicts', 'wp-site-doctor' ),
 					'plugin_xray'        => __( 'Plugin X-Ray', 'wp-site-doctor' ),
+					'storage'            => __( 'Storage & Cleanup', 'wp-site-doctor' ),
 				),
 				'description' => __( 'Select scanners to exclude from scans.', 'wp-site-doctor' ),
 			)
@@ -275,6 +276,7 @@ class Settings {
 			'images',
 			'plugin_conflicts',
 			'plugin_xray',
+			'storage',
 		);
 		$sanitized['excluded_checks'] = isset( $input['excluded_checks'] ) && is_array( $input['excluded_checks'] )
 			? array_intersect( array_map( 'sanitize_text_field', $input['excluded_checks'] ), $valid_checks )

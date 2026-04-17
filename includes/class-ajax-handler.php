@@ -111,6 +111,7 @@ class Ajax_Handler {
 			'images'             => __( 'Images', 'wp-site-doctor' ),
 			'plugin_conflicts'   => __( 'Plugin Conflicts', 'wp-site-doctor' ),
 			'plugin_xray'        => __( 'Plugin X-Ray', 'wp-site-doctor' ),
+			'storage'            => __( 'Storage & Cleanup', 'wp-site-doctor' ),
 		);
 
 		// Remove excluded scanners.

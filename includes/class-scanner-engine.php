@@ -51,6 +51,7 @@ class Scanner_Engine {
 			new Scanners\Image_Scanner(),
 			new Scanners\Plugin_Conflict_Scanner(),
 			new Scanners\Plugin_Xray_Scanner(),
+			new Scanners\Storage_Scanner(),
 		);
 
 		foreach ( $default_scanners as $scanner ) {

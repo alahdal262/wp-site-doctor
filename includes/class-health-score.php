@@ -25,13 +25,14 @@ class Health_Score {
 	 * @var array
 	 */
 	private $weights = array(
-		'security'           => 0.20,
-		'performance'        => 0.15,
-		'database'           => 0.12,
-		'plugin_conflicts'   => 0.12,
-		'server_environment' => 0.10,
-		'file_permissions'   => 0.08,
-		'cache'              => 0.07,
+		'security'           => 0.18,
+		'performance'        => 0.14,
+		'database'           => 0.10,
+		'storage'            => 0.10,
+		'plugin_conflicts'   => 0.10,
+		'server_environment' => 0.09,
+		'file_permissions'   => 0.07,
+		'cache'              => 0.06,
 		'images'             => 0.05,
 		'seo'                => 0.05,
 		'cron'               => 0.03,

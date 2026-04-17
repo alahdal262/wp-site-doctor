@@ -112,6 +112,14 @@ class Auto_Repair {
 				'callback' => array( $this, 'repair_bulk_add_alt_text' ),
 				'label'    => __( 'Auto-fill missing alt text from filenames', 'wp-site-doctor' ),
 			),
+			'delete_orphaned_media'      => array(
+				'callback' => array( $this, 'repair_delete_orphaned_media' ),
+				'label'    => __( 'Delete orphaned media files from disk', 'wp-site-doctor' ),
+			),
+			'purge_actionscheduler'      => array(
+				'callback' => array( $this, 'repair_purge_actionscheduler' ),
+				'label'    => __( 'Purge completed Action Scheduler entries', 'wp-site-doctor' ),
+			),
 		);
 
 		/**
@@ -752,6 +760,205 @@ class Auto_Repair {
 				$updated
 			),
 			'restore_data' => array( 'irreversible' => true, 'updated_count' => $updated ),
+		);
+	}
+
+	/**
+	 * Delete orphaned media files from the uploads directory.
+	 *
+	 * Finds files on disk that have no matching attachment record in the
+	 * database and deletes them. Processes in batches for safety.
+	 */
+	private function repair_delete_orphaned_media() {
+		global $wpdb;
+
+		$upload_dir = wp_upload_dir();
+		$basedir    = $upload_dir['basedir'];
+
+		if ( ! is_dir( $basedir ) ) {
+			return array(
+				'success'      => false,
+				'message'      => __( 'Uploads directory not found.', 'wp-site-doctor' ),
+				'restore_data' => array(),
+			);
+		}
+
+		// Build the set of known DB file paths.
+		$db_main_files = $wpdb->get_col(
+			"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file'"
+		);
+		$db_main_set = array_flip( $db_main_files );
+
+		$db_thumb_set = array();
+		$meta_rows    = $wpdb->get_col(
+			"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attachment_metadata'"
+		);
+
+		foreach ( $meta_rows as $raw ) {
+			$meta = maybe_unserialize( $raw );
+			if ( is_array( $meta ) && isset( $meta['sizes'] ) ) {
+				$dir = isset( $meta['file'] ) ? dirname( $meta['file'] ) : '';
+				foreach ( $meta['sizes'] as $size_data ) {
+					if ( isset( $size_data['file'] ) ) {
+						$db_thumb_set[ $dir . '/' . $size_data['file'] ] = 1;
+					}
+				}
+			}
+		}
+
+		// Scan and delete orphaned files.
+		$media_exts    = array( 'jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'tiff', 'svg', 'mp4', 'mp3', 'pdf' );
+		$deleted_count = 0;
+		$deleted_size  = 0;
+		$failed_count  = 0;
+		$batch_limit   = 10000; // Process up to 10,000 files per run for safety.
+
+		try {
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator( $basedir, \RecursiveDirectoryIterator::SKIP_DOTS ),
+				\RecursiveIteratorIterator::CHILD_FIRST
+			);
+
+			foreach ( $iterator as $file ) {
+				if ( ! $file->isFile() ) {
+					continue;
+				}
+
+				if ( $deleted_count >= $batch_limit ) {
+					break;
+				}
+
+				$ext = strtolower( $file->getExtension() );
+				if ( ! in_array( $ext, $media_exts, true ) ) {
+					continue;
+				}
+
+				$rel_path = str_replace( $basedir . '/', '', $file->getPathname() );
+
+				if ( ! isset( $db_main_set[ $rel_path ] ) && ! isset( $db_thumb_set[ $rel_path ] ) ) {
+					$size = $file->getSize();
+
+					if ( @unlink( $file->getPathname() ) ) {
+						++$deleted_count;
+						$deleted_size += $size;
+					} else {
+						++$failed_count;
+					}
+				}
+			}
+
+			// Clean up empty directories left behind.
+			$dir_iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator( $basedir, \RecursiveDirectoryIterator::SKIP_DOTS ),
+				\RecursiveIteratorIterator::CHILD_FIRST
+			);
+
+			foreach ( $dir_iterator as $item ) {
+				if ( $item->isDir() ) {
+					$dir_path = $item->getPathname();
+					// Only remove empty year/month directories, not the base.
+					if ( $dir_path !== $basedir && @rmdir( $dir_path ) ) {
+						// Removed empty directory.
+					}
+				}
+			}
+		} catch ( \Exception $e ) {
+			return array(
+				'success'      => false,
+				'message'      => $e->getMessage(),
+				'restore_data' => array(),
+			);
+		}
+
+		$size_human = round( $deleted_size / 1024 / 1024 );
+
+		$message = sprintf(
+			/* translators: 1: deleted count, 2: size in MB */
+			__( 'Deleted %1$s orphaned files (%2$s MB recovered).', 'wp-site-doctor' ),
+			number_format_i18n( $deleted_count ),
+			number_format_i18n( $size_human )
+		);
+
+		if ( $failed_count > 0 ) {
+			$message .= ' ' . sprintf(
+				/* translators: %s: count */
+				__( '%s files could not be deleted (permission denied).', 'wp-site-doctor' ),
+				number_format_i18n( $failed_count )
+			);
+		}
+
+		if ( $deleted_count >= $batch_limit ) {
+			$message .= ' ' . __( 'Batch limit reached — run again to continue.', 'wp-site-doctor' );
+		}
+
+		// Clear the orphan stats transient so next scan recalculates.
+		delete_transient( 'wpsd_orphan_stats' );
+
+		return array(
+			'success'      => $deleted_count > 0,
+			'message'      => $message,
+			'restore_data' => array(
+				'irreversible'  => true,
+				'deleted_count' => $deleted_count,
+				'deleted_size'  => $deleted_size,
+				'failed_count'  => $failed_count,
+			),
+		);
+	}
+
+	/**
+	 * Purge completed Action Scheduler entries.
+	 */
+	private function repair_purge_actionscheduler() {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'actionscheduler_actions';
+
+		// Check if table exists.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from prefix + constant.
+		$exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" );
+
+		if ( ! $exists ) {
+			return array(
+				'success'      => true,
+				'message'      => __( 'Action Scheduler tables not found.', 'wp-site-doctor' ),
+				'restore_data' => array(),
+			);
+		}
+
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table from prefix.
+				"SELECT COUNT(*) FROM {$table} WHERE status = %s",
+				'complete'
+			)
+		);
+
+		// Delete completed actions and their logs.
+		$wpdb->query(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table from prefix.
+				"DELETE FROM {$wpdb->prefix}actionscheduler_logs WHERE action_id IN (SELECT action_id FROM {$table} WHERE status = %s)",
+				'complete'
+			)
+		);
+
+		$wpdb->query(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table from prefix.
+				"DELETE FROM {$table} WHERE status = %s",
+				'complete'
+			)
+		);
+
+		return array(
+			'success'      => true,
+			'message'      => sprintf(
+				/* translators: %s: count */
+				__( 'Purged %s completed Action Scheduler entries.', 'wp-site-doctor' ),
+				number_format_i18n( $count )
+			),
+			'restore_data' => array( 'irreversible' => true, 'purged_count' => $count ),
 		);
 	}
 }
